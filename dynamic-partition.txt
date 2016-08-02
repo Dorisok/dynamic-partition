@@ -1,0 +1,96 @@
+CREATE EXTERNAL TABLE IF NOT EXISTS stg.d_sample_coeffs_final(
+    `ppg.id` string,
+    coef_model1_seaIndex string,
+    ceof_model1_NEWYEARDAY string,
+    ceof_model1_INDEPENDENCEDAY string,
+    ceof_model1_POSTSUMMERPEAK string,
+    ceof_model1_XMASDAY string,
+    ceof_model1_std string,
+    ceod_model_iqr string,
+    `ceof_model1_intercept.ppg.id` string,
+   `ceof_model1_stg.alt` string,
+    locationid string,
+    `ceof_model1_ln.baseprice` string,
+    ceof_model1_discount string,
+    ceof_model1_coupon string)
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
+    LOCATION '/user/chong/hive/warehouse/stg.db/sample/coeffs_final';
+
+
+
+
+
+//??????
+set hive.exec.dynamic.partition=true;(?????????:set hive.exec.dynamic.partition;) 
+set hive.exec.dynamic.partition.mode=nonstrict; 
+SET hive.exec.max.dynamic.partitions=100000;(?????????????,????)
+SET hive.exec.max.dynamic.partitions.pernode=100000;
+
+ CREATE TABLE ods.d_sample_data (
+   inventory_id string,
+   biblio_id string,
+   order_id string,
+   line_id string,
+   source_date string,
+   pub_date string,
+   catalog_type string,
+   source_lcp string,
+   current_lcp string,
+   list_price string,
+   rental_units string,
+   rental_price string,
+   rental_bookings string,
+   site_liq_units string,
+   site_liq_price string,
+   site_liq_bookings string,
+   real_price string,
+   bic_code string,
+   literal string,
+   literal_root string,
+   audience string,
+   biblio_series string,
+   bisac_code_series string,
+   literal_root_series string )
+   PARTITIONED BY (date string, bisac_code string);
+
+            //?????yarn???
+           spark-sql --master yarn --deploy-mode client --num-executors 8
+
+  set hive.exec.dynamic.partition=true;
+  set hive.exec.dynamic.partition.mode=nonstrict; 
+//???hive??????
+  SET hive.exec.max.dynamic.partitions=10000;
+  SET hive.exec.max.dynamic.partitions.pernode=10000;
+   insert overwrite table ods.d_sample_data
+   select
+      inventory_id,
+      biblio_id,
+      order_id,
+      line_id,
+      source_date,
+      pub_date,
+      catalog_type,
+      source_lcp,
+      current_lcp,
+      list_price,
+      rental_units,
+      rental_price,
+      rental_bookings,
+      site_liq_units,
+      site_liq_price,
+      site_liq_bookings,
+      real_price,
+      bic_code,
+      literal,
+      literal_root,
+      audience,
+      biblio_series,
+      bisac_code_series,
+      literal_root_series,
+      date,
+      bisac_code
+   from stg.d_sample_data;
+   
+
+
+
